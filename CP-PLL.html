@@ -1,0 +1,353 @@
+<head>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style type="text/css">
+  
+    #layout {
+      margin: 15px 0;
+      overflow: hidden;
+      min-width: 800px;
+      max-width: 1200px;
+    }
+    
+    #ran_tau{
+      width: 350px;
+    }
+    #val_tau{
+      margin: 0;
+      float: left;
+    }
+    #tx_tau{
+      width: 70px;
+      float: left;
+    }
+    
+    #ran_v{
+      width: 350px;
+    }
+    #val_v{
+      margin: 0;
+      float: left;
+    }
+    #tx_v{
+      width: 70px;
+      float: left;
+    }
+    
+    #ran_K_vco{
+      width: 230px;
+    }
+    #val_K_vco{
+      margin: 0;
+      float: left;
+    }
+    #tx_K_vco{
+      width: 70px;
+      float: left;
+    }
+    
+    #ran_T_ref{
+      width: 230px;
+    }
+    #val_T_ref{
+      margin: 0;
+      float: left;
+    }
+    #tx_T_ref{
+      width: 70px;
+      float: left;
+    }
+    
+    #ran_I_p{
+      width: 230px;
+    }
+    #val_I_p{
+      margin: 0;
+      float: left;
+    }
+    #tx_I_p{
+      width: 70px;
+      float: left;
+    }
+    
+    #ran_C{
+      width: 230px;
+    }
+    #val_C{
+      margin: 0;
+      float: left;
+    }
+    #tx_C{
+      width: 70px;
+      float: left;
+    }
+    
+    #ran_R{
+      width: 230px;
+    }
+    #val_R{
+      margin: 0;
+      float: left;
+    }
+    #tx_R{
+      width: 70px;
+      float: left;
+    }
+    
+    #ran_omega_free{
+      width: 230px;
+    }
+    #val_omega_free{
+      margin: 0;
+      float: left;
+    }
+    #tx_omega_free{
+      width: 70px;
+      float: left;
+    }
+    
+    #graph{
+       width: 720px
+    }
+  </style>
+</head>
+<body>
+
+  <table border="1">
+    <tr>
+      <td>
+        <p id="val_tau">Tau_0 = </p>
+        <input type="number" id="tx_tau" step="0.5" oninput="ran_tau.value=this.value;
+                                                             tau_Change(this.value)"><br>
+        <input type="range" id="ran_tau" min="0" max="100" step="0.5" oninput="tau_Change(this.value)">
+      </td>
+
+      <td>
+        <p id="val_v">V_0 = </p>
+        <input type="number" id="tx_v" step="0.5" oninput="ran_v.value=this.value;
+                                                           v_Change(this.value)"><br>
+        <input type="range" id="ran_v" min="0" max="100" step="0.5" oninput="v_Change(this.value)">
+      </td>
+    </tr>
+  </table>
+  <table border="1">
+    <tr>
+      <td>
+        <p id="val_K_vco">K_vco = </p>
+        <input type="number" id="tx_K_vco" step="0.05" oninput="ran_K_vco.value=this.value;
+                                                                K_vco_Change(this.value)"><br>
+        <input type="range" id="ran_K_vco" min="0.05" max="10" step="0.05" oninput="K_vco_Change(this.value)">
+      </td>
+
+      <td>
+        <p id="val_T_ref">T_ref = </p>
+        <input type="number" id="tx_T_ref" step="0.05" oninput="ran_T_ref.value=this.value;
+                                                                T_ref_Change(this.value)"><br>
+        <input type="range" id="ran_T_ref" min="-5" max="5" step="0.05" oninput="T_ref_Change(this.value)">
+      </td>
+
+      <td>
+        <p id="val_I_p">I_p = </p>
+        <input type="number" id="tx_I_p" step="0.05" oninput="ran_I_p.value=this.value;
+                                                              I_p_Change(this.value)"><br>
+        <input type="range" id="ran_I_p" min="0.05" max="10" step="0.05" oninput="I_p_Change(this.value)">
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <p id="val_C">C = </p>
+        <input type="number" id="tx_C" step="0.05" oninput="ran_C.value=this.value;
+                                                            C_Change(this.value)"><br>
+        <input type="range" id="ran_C" min="0.05" max="10" step="0.05" oninput="C_Change(this.value)">
+      </td>
+
+      <td>
+        <p id="val_R">R = </p>
+        <input type="number" id="tx_R" step="0.05" oninput="ran_R.value=this.value;
+                                                            R_Change(this.value)"><br>
+        <input type="range" id="ran_R" min="-5" max="5" step="0.05" oninput="R_Change(this.value)">
+      </td>
+
+      <td>
+        <p id="val_omega_free">omega_free = </p>
+        <input type="number" id="tx_omega_free" step="0.05" oninput="ran_omega_free.value=this.value;
+                                                                     omega_free_Change(this.value)"><br>
+        <input type="range" id="ran_omega_free" min="-5" max="5" step="0.05" oninput="omega_free_Change(this.value)">
+      </td>
+    </tr>
+  </table>
+ 
+  <div id="graph"></div>
+  
+  <script>
+
+
+var len = 1000
+
+var coor_tau = new Array(len).fill(0);
+var coor_v = new Array(len).fill(0);
+
+var K_vco = 0.1;
+var T_ref = 2;
+var I_p = 0.15;
+var C = 0.15;
+var R = 0.75;
+var omega_free = 0.1;
+coor_tau[0] = 1.5;
+coor_v[0] = 3.5;
+
+
+tx_tau.value = coor_tau[0];
+ran_tau.value = coor_tau[0];
+
+tx_v.value = coor_v[0];
+ran_v.value = coor_v[0];
+
+tx_K_vco.value = K_vco;
+ran_K_vco.value = K_vco;
+
+tx_T_ref.value = T_ref;
+ran_T_ref.value = T_ref;
+
+tx_I_p.value = I_p;
+ran_I_p.value = I_p
+
+tx_C.value = C;
+ran_C.value = C
+
+tx_R.value = R;
+ran_R.value = R
+
+tx_omega_free.value = omega_free;
+ran_omega_free.value = omega_free;
+
+function getNewCoor(tau_k, v_k, K_vco, T_ref, I_p, C, R, omega_free) {
+  var tau_k1;
+  var v_k1;
+  var tau_k_zero;
+  if(tau_k >= 0) {
+    var c = (T_ref - (tau_k % T_ref))*(omega_free+K_vco*v_k)-1;
+    if (c <= 0){
+   	  var a = K_vco*I_p/(2*C);
+      var b = omega_free + K_vco*v_k + K_vco*I_p*R;
+      tau_k1 = (-b + Math.sqrt(b*b - 4*a*c))/(2*a);
+      tau_k_zero = T_ref - (tau_k % T_ref);
+    } else {
+      tau_k1 = 1/(omega_free + K_vco*v_k) - T_ref + (tau_k % T_ref);
+      tau_k_zero = 1/(omega_free + K_vco*v_k);
+    }
+  } else {
+    lk = -tau_k;
+    S_lk = (K_vco*v_k-I_p*R*K_vco+omega_free)*lk+(K_vco*I_p*lk*lk)/(2*C);
+    S_la = S_lk % 1;
+    S_lb = 1-S_la;
+    lb = S_lb/(K_vco*v_k + omega_free);
+    if (lb <= T_ref) {
+      l_k1 = T_ref - lb;
+      tau_k1 = -l_k1;
+      tau_k_zero = lb;
+    } else {
+      S_Tref = T_ref*(K_vco*v_k + omega_free);
+      c = S_la + S_Tref - 1;
+      b = omega_free + K_vco*v_k + K_vco*I_p*R;
+      a = K_vco*I_p/(2*C);
+      tau_k1 = (-b + Math.sqrt(b*b - 4*a*c))/(2*a);
+      tau_k_zero = T_ref;
+    }
+  }
+  v_k1 = v_k + tau_k1*I_p/C;
+  return {tau: tau_k1, v: v_k1, tau_k_zero: tau_k_zero}
+}
+
+function changeCoor(tau_0, v_0, K_vco, T_ref, I_p, C, R, omega_free, len) {
+  max_tau = tau_0
+  min_tau = tau_0
+  coor_v[0] = v_0;
+  coor_tau[0] = tau_0;
+  coor = {tau: tau_0, v: v_0};
+  var i;
+  for (i = 1; i < len; i++) { 
+  	coor = getNewCoor(coor.tau, coor.v, K_vco, T_ref, I_p, C, R, omega_free)
+    coor_tau[i] = coor.tau;
+    coor_v[i] = coor.v;
+  }
+}
+
+
+Plotly.plot('graph', [{
+  x: coor_tau,
+  y: coor_v
+}], {
+  xaxis: {range: [-30, 30]},
+  yaxis: {range: [-30, 30]}
+}, {showSendToCloud:true})
+
+function tau_Change(tau_0) {
+  coor_tau[0] = Number(tau_0);
+  tx_tau.value = coor_tau[0];
+  changeCoor(coor_tau[0], coor_v[0], K_vco, T_ref, I_p, C, R, omega_free, len);
+}
+
+function v_Change(v_0) {
+  coor_v[0] = Number(v_0);
+  tx_v.value = coor_v[0];
+  changeCoor(coor_tau[0], coor_v[0], K_vco, T_ref, I_p, C, R, omega_free, len);
+}
+
+function K_vco_Change(val) {
+  K_vco = Number(val);
+  tx_K_vco.value = K_vco;
+  changeCoor(coor_tau[0], coor_v[0], K_vco, T_ref, I_p, C, R, omega_free, len);
+}
+
+function T_ref_Change(val) {
+  T_ref = Number(val);
+  tx_T_ref.value = T_ref;
+  changeCoor(coor_tau[0], coor_v[0], K_vco, T_ref, I_p, C, R, omega_free, len);
+}
+
+function I_p_Change(val) {
+  I_p = Number(val);
+  tx_I_p.value = I_p;
+  changeCoor(coor_tau[0], coor_v[0], K_vco, T_ref, I_p, C, R, omega_free, len);
+}
+
+function C_Change(val) {
+  C = Number(val);
+  tx_C.value = C;
+  changeCoor(coor_tau[0], coor_v[0], K_vco, T_ref, I_p, C, R, omega_free, len);
+}
+
+function R_Change(val) {
+  R = Number(val);
+  tx_R.value = R;
+  changeCoor(coor_tau[0], coor_v[0], K_vco, T_ref, I_p, C, R, omega_free, len);
+}
+
+function omega_free_Change(val) {
+  omega_free = Number(val);
+  tx_omega_free.value = omega_free;
+  changeCoor(coor_tau[0], coor_v[0], K_vco, T_ref, I_p, C, R, omega_free, len);
+}
+
+function update () {
+  let eps = 4
+  Plotly.animate('graph', {
+    data: [{x: coor_tau, y: coor_v}]
+  }, {
+    transition: {
+      duration: 500,
+    },
+    frame: {
+      duration: 0,
+      redraw: false,
+    }
+  });
+  
+  requestAnimationFrame(update);
+}
+
+changeCoor(coor_tau[0], coor_v[0], K_vco, T_ref, I_p, C, R, omega_free, len);
+requestAnimationFrame(update);
+  </script>
+</body>
