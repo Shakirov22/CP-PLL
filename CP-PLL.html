@@ -169,7 +169,7 @@
       </td>
 
       <td>
-        <p id="val_omega_free">omega_free = </p>
+        <p id="val_omega_free">Omega^free_vco = </p>
         <input type="number" id="tx_omega_free" step="0.05" oninput="ran_omega_free.value=this.value;
                                                                      omega_free_Change(this.value)"><br>
         <input type="range" id="ran_omega_free" min="-5" max="5" step="0.05" oninput="omega_free_Change(this.value)">
@@ -180,8 +180,7 @@
   <div id="graph"></div>
   
   <script>
-
-
+//Объявление переменных
 var len = 1000
 
 var coor_tau = new Array(len).fill(0);
@@ -221,6 +220,7 @@ ran_R.value = R
 tx_omega_free.value = omega_free;
 ran_omega_free.value = omega_free;
 
+//Функция расчета новых координат
 function getNewCoor(tau_k, v_k, K_vco, T_ref, I_p, C, R, omega_free) {
   var tau_k1;
   var v_k1;
@@ -273,7 +273,7 @@ function changeCoor(tau_0, v_0, K_vco, T_ref, I_p, C, R, omega_free, len) {
   }
 }
 
-
+//Создание объекта графика
 Plotly.plot('graph', [{
   x: coor_tau,
   y: coor_v
@@ -282,6 +282,7 @@ Plotly.plot('graph', [{
   yaxis: {range: [-30, 30]}
 }, {showSendToCloud:true})
 
+//Чтение изменения параметров
 function tau_Change(tau_0) {
   coor_tau[0] = Number(tau_0);
   tx_tau.value = coor_tau[0];
@@ -330,6 +331,7 @@ function omega_free_Change(val) {
   changeCoor(coor_tau[0], coor_v[0], K_vco, T_ref, I_p, C, R, omega_free, len);
 }
 
+//Обновление графика
 function update () {
   let eps = 4
   Plotly.animate('graph', {
